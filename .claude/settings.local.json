@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(Get-ChildItem -Path \"backend\\\\uploads\" -Force)",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force)",
+      "PowerShell(Get-Service -Name MSSQLSERVER -ErrorAction SilentlyContinue)",
+      "PowerShell(sqlcmd -L)",
+      "PowerShell(sqlcmd -S localhost -E -Q \"SELECT @@SERVERNAME\")",
+      "PowerShell(Stop-Process -Force -Confirm:$false)",
+      "PowerShell(sqlcmd -S localhost -E -d galeria_arte -Q \"SELECT id, filename, title, artist, category FROM Images\" -W)",
+      "PowerShell(curl.exe -s -X DELETE http://localhost:5000/api/images/1784370846989-963507332.jpg)",
+      "PowerShell(sqlcmd -S localhost -E -d galeria_arte -Q \"SET NOCOUNT ON; SELECT filename, title, description, artist, category, filepath, fileSize, mimetype, CONVERT\\(varchar, uploadDate, 126\\) as uploadDate FROM Images\" -W -s \"|\")",
+      "PowerShell(git --version; try { \\(Get-Command gh -ErrorAction Stop\\).Source; gh auth status 2>&1 } catch { \"gh CLI no instalado\" })",
+      "PowerShell(git config --global user.name)",
+      "PowerShell(git config --global user.email)"
+    ]
+  }
+}

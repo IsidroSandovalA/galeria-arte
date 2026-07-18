@@ -1,0 +1,16 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (contienen credenciales)
+.env
+.env.local
+
+# Builds
+frontend/dist/
+
+# Imágenes subidas (viven en el volumen de Railway, no en el repo)
+backend/uploads/
+
+# Sistema
+.DS_Store
+Thumbs.db

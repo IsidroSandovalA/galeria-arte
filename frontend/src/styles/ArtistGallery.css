@@ -1,0 +1,77 @@
+.artist-gallery-section {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.artist-gallery-section h2 {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #c8963e 0%, #e2b457 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 40px;
+  font-weight: 700;
+}
+
+.artist-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.empty-gallery {
+  text-align: center;
+  padding: 100px 40px;
+  color: #9b9b93;
+  grid-column: 1 / -1;
+}
+
+.empty-icon {
+  font-size: 5.5rem;
+  margin-bottom: 30px;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(200, 150, 62, 0.3));
+}
+
+.empty-gallery h3 {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #c8963e 0%, #e2b457 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.empty-gallery p {
+  font-size: 1.15rem;
+  color: #c9c6bd;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-25px);
+  }
+}
+
+@media (max-width: 768px) {
+  .artist-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .artist-gallery-section h2 {
+    font-size: 1.5rem;
+  }
+}
