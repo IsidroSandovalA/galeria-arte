@@ -6,7 +6,8 @@ const UPLOADS_DIR = path.join(__dirname, '../../uploads');
 
 // URL pública del backend (en Railway se define BASE_URL; local usa localhost)
 function baseUrl() {
-  return process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+  const url = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+  return url.replace(/\/+$/, '');
 }
 
 class ImageController {
