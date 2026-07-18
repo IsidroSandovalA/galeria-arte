@@ -14,7 +14,13 @@
       "PowerShell(sqlcmd -S localhost -E -d galeria_arte -Q \"SET NOCOUNT ON; SELECT filename, title, description, artist, category, filepath, fileSize, mimetype, CONVERT\\(varchar, uploadDate, 126\\) as uploadDate FROM Images\" -W -s \"|\")",
       "PowerShell(git --version; try { \\(Get-Command gh -ErrorAction Stop\\).Source; gh auth status 2>&1 } catch { \"gh CLI no instalado\" })",
       "PowerShell(git config --global user.name)",
-      "PowerShell(git config --global user.email)"
+      "PowerShell(git config --global user.email)",
+      "PowerShell(cmdkey /delete:\"LegacyGeneric:target=git:https://isaidro343-personal@github.com\")",
+      "PowerShell(Invoke-RestMethod -Uri \"https://galeria-arte-production-55ca.up.railway.app/api/health\" -Method Get | ConvertTo-Json; try { Invoke-RestMethod -Uri \"https://galeria-arte-production-55ca.up.railway.app/api/images\" -Method Get | ConvertTo-Json -Depth 5 } catch { \"Error /api/images: $\\($_.Exception.Message\\)\" })",
+      "PowerShell($env:NODE_PATH = \"C:\\\\Users\\\\isaid\\\\OneDrive\\\\Escritorio\\\\proyecto papa\\\\PROYECTO\\\\proyecto_reac_nodejs\\\\backend\\\\node_modules\"; $env:SETUP_DB_URL = \"postgresql://postgres:MwlQMOvJystiPWJlCqekiDXTbQGtpsEH@shortline.proxy.rlwy.net:37244/railway\"; node \"C:\\\\Users\\\\isaid\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-isaid-OneDrive-Escritorio-proyecto-papa-PROYECTO-proyecto-reac-nodejs\\\\0b9a8a1c-3990-4b78-902e-d724fcba6c7b\\\\scratchpad\\\\setup_db.js\")",
+      "PowerShell(Invoke-RestMethod -Uri \"https://galeria-arte-production-55ca.up.railway.app/api/images\" -Method Get)",
+      "PowerShell($r = Invoke-WebRequest -Uri \"https://galeria-arte-production-55ca.up.railway.app/1784366518055-860892447.jpg\" -Method Head -UseBasicParsing; \"Status: $\\($r.StatusCode\\) | Tipo: $\\($r.Headers['Content-Type']\\) | Tamaño: $\\($r.Headers['Content-Length']\\) bytes\")",
+      "PowerShell(Start-Sleep -Seconds 90; \\(Invoke-RestMethod -Uri \"https://galeria-arte-production-55ca.up.railway.app/api/images\" -Method Get\\).images[0].url)"
     ]
   }
 }

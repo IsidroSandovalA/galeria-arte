@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import QRCode from 'qrcode.react'
+import { QRCodeCanvas as QRCode } from 'qrcode.react'
 import '../styles/ArtistImageCard.css'
 
 function ArtistImageCard({ image, onDelete }) {
