@@ -35,6 +35,27 @@ function ArtistImageCard({ image, onDelete, onUpdate }) {
     }
   }
 
+  const handleShareLink = async () => {
+    const shareData = {
+      title: image.title || 'Obra de arte',
+      text: `Mira esta obra de arte: ${image.title}${image.artist ? ` por ${image.artist}` : ''}`,
+      url: imageDetailUrl
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Error al compartir:', err)
+        }
+      }
+    } else {
+      navigator.clipboard.writeText(imageDetailUrl)
+      alert('Enlace copiado al portapapeles')
+    }
+  }
+
   const handleDelete = async () => {
     setDeleting(true)
     await onDelete(image.filename)
@@ -88,6 +109,13 @@ function ArtistImageCard({ image, onDelete, onUpdate }) {
             title="Ver código QR"
           >
             📱 QR
+          </button>
+          <button
+            className="share-btn"
+            onClick={handleShareLink}
+            title="Compartir enlace"
+          >
+            🔗 Compartir
           </button>
         </div>
       </div>
