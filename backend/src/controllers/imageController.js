@@ -10,6 +10,17 @@ function baseUrl() {
   return url.replace(/\/+$/, '');
 }
 
+// Normaliza la fecha de publicación recibida del formulario.
+// Una fecha pura (YYYY-MM-DD) se fija a mediodía para que no se
+// recorra un día al mostrarse en otras zonas horarias.
+function parseUploadDate(value) {
+  if (!value) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return `${value} 12:00:00`;
+  }
+  return value;
+}
+
 class ImageController {
   // Obtener todas las imágenes
   getAllImages = async (req, res) => {
@@ -45,11 +56,11 @@ class ImageController {
         return res.status(400).json({ error: 'No se proporcionó archivo' });
       }
 
-      const { title, description, artist, category } = req.body;
+      const { title, description, artist, category, uploadDate } = req.body;
 
       const result = await pool.query(
-        `INSERT INTO images (filename, title, description, artist, category, filepath, file_size, mimetype)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `INSERT INTO images (filename, title, description, artist, category, filepath, file_size, mimetype, upload_date)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, COALESCE($9::timestamp, NOW()))
          RETURNING id, upload_date`,
         [
           req.file.filename,
@@ -59,7 +70,8 @@ class ImageController {
           category || 'otro',
           req.file.path,
           req.file.size,
-          req.file.mimetype
+          req.file.mimetype,
+          parseUploadDate(uploadDate)
         ]
       );
 
@@ -89,17 +101,18 @@ class ImageController {
   updateImage = async (req, res) => {
     try {
       const { filename } = req.params;
-      const { title, description, artist, category } = req.body;
+      const { title, description, artist, category, uploadDate } = req.body;
 
       const result = await pool.query(
         `UPDATE images
          SET title = COALESCE($1, title),
              description = COALESCE($2, description),
              artist = COALESCE($3, artist),
-             category = COALESCE($4, category)
-         WHERE filename = $5
+             category = COALESCE($4, category),
+             upload_date = COALESCE($5::timestamp, upload_date)
+         WHERE filename = $6
          RETURNING id, filename, title, description, artist, category, upload_date`,
-        [title, description, artist, category, filename]
+        [title, description, artist, category, parseUploadDate(uploadDate), filename]
       );
 
       if (result.rows.length === 0) {

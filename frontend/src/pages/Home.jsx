@@ -43,7 +43,7 @@ function Home() {
   return (
     <div className="home">
       <header className="header">
-        <h1>🎨 Galería de Arte</h1>
+        <h1>🎨 Galería ISG</h1>
         <p>Sube y comparte tus obras maestras</p>
       </header>
 

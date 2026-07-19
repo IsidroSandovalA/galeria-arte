@@ -11,6 +11,7 @@ function UploadForm({ onUpload }) {
   const [description, setDescription] = useState('')
   const [artist, setArtist] = useState('')
   const [category, setCategory] = useState('otro')
+  const [uploadDate, setUploadDate] = useState(() => new Date().toISOString().slice(0, 10))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [preview, setPreview] = useState(null)
@@ -43,6 +44,7 @@ function UploadForm({ onUpload }) {
     formData.append('description', description)
     formData.append('artist', artist || 'Anónimo')
     formData.append('category', category)
+    formData.append('uploadDate', uploadDate)
 
     try {
       setLoading(true)
@@ -70,6 +72,7 @@ function UploadForm({ onUpload }) {
       setDescription('')
       setArtist('')
       setCategory('otro')
+      setUploadDate(new Date().toISOString().slice(0, 10))
       setPreview(null)
       setError('')
     } catch (err) {
@@ -149,6 +152,17 @@ function UploadForm({ onUpload }) {
             <option value="digital">Digital</option>
             <option value="otro">Otro</option>
           </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="uploadDate">Fecha de Publicación</label>
+          <input
+            type="date"
+            id="uploadDate"
+            value={uploadDate}
+            onChange={(e) => setUploadDate(e.target.value)}
+            disabled={loading}
+          />
         </div>
 
         <div className="form-group">

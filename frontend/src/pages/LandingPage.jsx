@@ -9,7 +9,7 @@ function LandingPage() {
     <div className="landing-page">
       <div className="landing-content">
         <div className="landing-header">
-          <h1>🎨 Galería de Arte Digital</h1>
+          <h1>🎨 Galería ISG</h1>
           <p>Una plataforma moderna para artistas y amantes del arte</p>
         </div>
 

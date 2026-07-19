@@ -30,7 +30,7 @@ function GalleryPage() {
     <div className="gallery-page">
       <header className="gallery-header">
         <div className="header-content">
-          <h1>🎨 Galería de Arte</h1>
+          <h1>🎨 Galería ISG</h1>
           <p>Explora obras maestras de artistas</p>
         </div>
         <button className="back-btn" onClick={() => navigate('/')}>

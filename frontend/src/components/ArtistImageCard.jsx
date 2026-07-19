@@ -17,7 +17,8 @@ function ArtistImageCard({ image, onDelete, onUpdate }) {
     title: image.title || '',
     artist: image.artist || '',
     category: image.category || 'otro',
-    description: image.description || ''
+    description: image.description || '',
+    uploadDate: image.uploadDate ? String(image.uploadDate).slice(0, 10) : ''
   })
   const qrRef = useRef()
 
@@ -120,6 +121,13 @@ function ArtistImageCard({ image, onDelete, onUpdate }) {
             <option value="digital">Digital</option>
             <option value="otro">Otro</option>
           </select>
+
+          <label>Fecha de Publicación</label>
+          <input
+            type="date"
+            value={form.uploadDate}
+            onChange={(e) => setForm({ ...form, uploadDate: e.target.value })}
+          />
 
           <label>Descripción</label>
           <textarea
