@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import ArtistImageCard from './ArtistImageCard'
 import '../styles/ArtistGallery.css'
 
-function ArtistGallery({ images, onDelete }) {
+function ArtistGallery({ images, onDelete, onUpdate }) {
   if (images.length === 0) {
     return (
       <div className="empty-gallery">
@@ -22,6 +22,7 @@ function ArtistGallery({ images, onDelete }) {
             key={image.filename}
             image={image}
             onDelete={onDelete}
+            onUpdate={onUpdate}
           />
         ))}
       </div>

@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { API_URL } from '../config/api'
+import { authHeaders, clearSession } from '../config/auth'
 import '../styles/UploadForm.css'
 
 function UploadForm({ onUpload }) {
+  const navigate = useNavigate()
   const [file, setFile] = useState(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -45,8 +48,15 @@ function UploadForm({ onUpload }) {
       setLoading(true)
       const response = await fetch(`${API_URL}/api/images/upload`, {
         method: 'POST',
+        headers: authHeaders(),
         body: formData
       })
+
+      if (response.status === 401) {
+        clearSession()
+        navigate('/login')
+        return
+      }
 
       if (!response.ok) {
         throw new Error('Error al subir la imagen')

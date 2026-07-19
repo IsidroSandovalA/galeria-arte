@@ -166,8 +166,137 @@
   padding: 15px 20px;
 }
 
-.delete-btn {
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn {
+  flex: 1;
+  padding: 12px;
+  background: rgba(200, 150, 62, 0.1);
+  border: 1.5px solid rgba(200, 150, 62, 0.35);
+  color: #e2b457;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.edit-btn:hover {
+  background: rgba(200, 150, 62, 0.2);
+  border-color: rgba(200, 150, 62, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(200, 150, 62, 0.2);
+}
+
+.edit-form {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.edit-form label {
+  color: #c8963e;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+.edit-form input,
+.edit-form select,
+.edit-form textarea {
   width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(200, 150, 62, 0.2);
+  border-radius: 8px;
+  color: #e7e4dc;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.edit-form input:focus,
+.edit-form select:focus,
+.edit-form textarea:focus {
+  border-color: rgba(200, 150, 62, 0.6);
+}
+
+.edit-form select option {
+  background: #1a1a1c;
+  color: #e7e4dc;
+}
+
+.edit-error {
+  color: #fca5a5;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.save-btn {
+  flex: 1;
+  padding: 11px;
+  background: linear-gradient(135deg, #c8963e 0%, #e2b457 100%);
+  border: none;
+  border-radius: 8px;
+  color: #101012;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(200, 150, 62, 0.3);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(155, 155, 147, 0.3);
+  color: #9b9b93;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  border-color: rgba(155, 155, 147, 0.6);
+  color: #e7e4dc;
+}
+
+.delete-btn {
+  flex: 1;
   padding: 12px;
   background: rgba(239, 68, 68, 0.1);
   border: 1.5px solid rgba(239, 68, 68, 0.3);

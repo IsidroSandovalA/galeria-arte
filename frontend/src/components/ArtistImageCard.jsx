@@ -1,11 +1,24 @@
 import React, { useState, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { QRCodeCanvas as QRCode } from 'qrcode.react'
+import { API_URL } from '../config/api'
+import { authHeaders, clearSession } from '../config/auth'
 import '../styles/ArtistImageCard.css'
 
-function ArtistImageCard({ image, onDelete }) {
+function ArtistImageCard({ image, onDelete, onUpdate }) {
+  const navigate = useNavigate()
   const [showQR, setShowQR] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [editError, setEditError] = useState('')
+  const [form, setForm] = useState({
+    title: image.title || '',
+    artist: image.artist || '',
+    category: image.category || 'otro',
+    description: image.description || ''
+  })
   const qrRef = useRef()
 
   const imageDetailUrl = `${window.location.origin}/image/${image.filename}`
@@ -28,6 +41,41 @@ function ArtistImageCard({ image, onDelete }) {
     setShowDeleteConfirm(false)
   }
 
+  const handleSaveEdit = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    setEditError('')
+
+    try {
+      const response = await fetch(`${API_URL}/api/images/${image.filename}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders()
+        },
+        body: JSON.stringify(form)
+      })
+
+      if (response.status === 401) {
+        clearSession()
+        navigate('/login')
+        return
+      }
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al guardar')
+      }
+
+      onUpdate(data.image)
+      setEditing(false)
+    } catch (err) {
+      setEditError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="artist-image-card">
       <div className="artist-image-wrapper">
@@ -43,10 +91,65 @@ function ArtistImageCard({ image, onDelete }) {
         </div>
       </div>
 
-      <div className="artist-card-info">
-        <h3>{image.title}</h3>
-        {image.artist && <p className="artist">Por: {image.artist}</p>}
-      </div>
+      {editing ? (
+        <form className="edit-form" onSubmit={handleSaveEdit}>
+          <label>Título</label>
+          <input
+            type="text"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            required
+          />
+
+          <label>Artista</label>
+          <input
+            type="text"
+            value={form.artist}
+            onChange={(e) => setForm({ ...form, artist: e.target.value })}
+            required
+          />
+
+          <label>Categoría</label>
+          <select
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          >
+            <option value="pintura">Pintura</option>
+            <option value="fotografía">Fotografía</option>
+            <option value="escultura">Escultura</option>
+            <option value="digital">Digital</option>
+            <option value="otro">Otro</option>
+          </select>
+
+          <label>Descripción</label>
+          <textarea
+            rows="4"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+          />
+
+          {editError && <p className="edit-error">⚠️ {editError}</p>}
+
+          <div className="edit-buttons">
+            <button type="submit" className="save-btn" disabled={saving}>
+              {saving ? 'Guardando...' : '💾 Guardar'}
+            </button>
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={() => setEditing(false)}
+              disabled={saving}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="artist-card-info">
+          <h3>{image.title}</h3>
+          {image.artist && <p className="artist">Por: {image.artist}</p>}
+        </div>
+      )}
 
       {showQR && (
         <div className="qr-container">
@@ -66,36 +169,46 @@ function ArtistImageCard({ image, onDelete }) {
         </div>
       )}
 
-      <div className="artist-card-actions">
-        {showDeleteConfirm ? (
-          <div className="delete-confirm">
-            <p>¿Eliminar obra?</p>
-            <div className="confirm-buttons">
+      {!editing && (
+        <div className="artist-card-actions">
+          {showDeleteConfirm ? (
+            <div className="delete-confirm">
+              <p>¿Eliminar obra?</p>
+              <div className="confirm-buttons">
+                <button
+                  className="confirm-yes"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                >
+                  Sí
+                </button>
+                <button
+                  className="confirm-no"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleting}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="action-buttons">
               <button
-                className="confirm-yes"
-                onClick={handleDelete}
-                disabled={deleting}
+                className="edit-btn"
+                onClick={() => setEditing(true)}
               >
-                Sí
+                ✏️ Editar
               </button>
               <button
-                className="confirm-no"
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleting}
+                className="delete-btn"
+                onClick={() => setShowDeleteConfirm(true)}
               >
-                No
+                🗑️ Eliminar
               </button>
             </div>
-          </div>
-        ) : (
-          <button
-            className="delete-btn"
-            onClick={() => setShowDeleteConfirm(true)}
-          >
-            🗑️ Eliminar
-          </button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

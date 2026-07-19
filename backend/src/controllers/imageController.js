@@ -85,6 +85,47 @@ class ImageController {
     }
   };
 
+  // Actualizar los campos de una obra
+  updateImage = async (req, res) => {
+    try {
+      const { filename } = req.params;
+      const { title, description, artist, category } = req.body;
+
+      const result = await pool.query(
+        `UPDATE images
+         SET title = COALESCE($1, title),
+             description = COALESCE($2, description),
+             artist = COALESCE($3, artist),
+             category = COALESCE($4, category)
+         WHERE filename = $5
+         RETURNING id, filename, title, description, artist, category, upload_date`,
+        [title, description, artist, category, filename]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Imagen no encontrada' });
+      }
+
+      const img = result.rows[0];
+      res.json({
+        message: 'Obra actualizada exitosamente',
+        image: {
+          id: img.id,
+          filename: img.filename,
+          title: img.title,
+          description: img.description || '',
+          artist: img.artist,
+          category: img.category,
+          url: `${baseUrl()}/${img.filename}`,
+          uploadDate: img.upload_date
+        }
+      });
+    } catch (error) {
+      console.error('Error al actualizar imagen:', error);
+      res.status(500).json({ error: 'Error al actualizar imagen' });
+    }
+  };
+
   // Eliminar una imagen
   deleteImage = async (req, res) => {
     try {

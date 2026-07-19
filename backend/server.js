@@ -36,6 +36,7 @@ app.use(express.json());
 app.use(express.static(UPLOADS_DIR));
 
 // Routes
+app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/images', require('./src/routes/images'));
 
 // Health check

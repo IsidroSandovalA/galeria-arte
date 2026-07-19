@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import UploadForm from '../components/UploadForm'
 import ArtistGallery from '../components/ArtistGallery'
 import { API_URL } from '../config/api'
+import { authHeaders, clearSession, getUsername } from '../config/auth'
 import '../styles/ArtistPage.css'
 
 function ArtistPage() {
@@ -33,13 +34,30 @@ function ArtistPage() {
 
   const handleImageDelete = async (filename) => {
     try {
-      await fetch(`${API_URL}/api/images/${filename}`, {
-        method: 'DELETE'
+      const response = await fetch(`${API_URL}/api/images/${filename}`, {
+        method: 'DELETE',
+        headers: authHeaders()
       })
+      if (response.status === 401) {
+        clearSession()
+        navigate('/login')
+        return
+      }
       setImages(images.filter(img => img.filename !== filename))
     } catch (error) {
       console.error('Error al eliminar imagen:', error)
     }
+  }
+
+  const handleImageUpdate = (updatedImage) => {
+    setImages(images.map(img =>
+      img.filename === updatedImage.filename ? updatedImage : img
+    ))
+  }
+
+  const handleLogout = () => {
+    clearSession()
+    navigate('/')
   }
 
   return (
@@ -47,11 +65,19 @@ function ArtistPage() {
       <header className="artist-header">
         <div className="header-content">
           <h1>🎭 Panel del Artista</h1>
-          <p>Gestiona y comparte tus obras maestras</p>
+          <p>Bienvenido, {getUsername() || 'artista'} — gestiona y comparte tus obras</p>
         </div>
-        <button className="back-btn" onClick={() => navigate('/')}>
-          ← Volver al inicio
-        </button>
+        <div className="header-actions">
+          <button className="back-btn" onClick={() => navigate('/gallery')}>
+            👁️ Ver galería
+          </button>
+          <button className="back-btn" onClick={() => navigate('/')}>
+            ← Inicio
+          </button>
+          <button className="logout-btn" onClick={handleLogout}>
+            🚪 Cerrar sesión
+          </button>
+        </div>
       </header>
 
       <div className="artist-container">
@@ -62,6 +88,7 @@ function ArtistPage() {
           <ArtistGallery
             images={images}
             onDelete={handleImageDelete}
+            onUpdate={handleImageUpdate}
           />
         )}
       </div>
