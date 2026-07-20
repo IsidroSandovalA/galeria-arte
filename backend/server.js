@@ -33,7 +33,8 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173'
 }));
 app.use(express.json());
-app.use(express.static(UPLOADS_DIR));
+// NOTA: Los archivos ahora se sirven desde S3, no localmente
+// app.use(express.static(UPLOADS_DIR));
 
 // Routes
 app.use('/api/auth', require('./src/routes/auth'));

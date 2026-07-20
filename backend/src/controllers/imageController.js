@@ -1,13 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const { pool } = require('../config/database');
+const s3Service = require('../services/s3Service');
 
-const UPLOADS_DIR = path.join(__dirname, '../../uploads');
-
-// URL pública del backend (en Railway se define BASE_URL; local usa localhost)
-function baseUrl() {
-  const url = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
-  return url.replace(/\/+$/, '');
+// URL de S3 (las imágenes ahora se sirven desde S3)
+function getImageUrl(filename) {
+  return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/${filename}`;
 }
 
 // Normaliza la fecha de publicación recibida del formulario.
@@ -39,7 +37,7 @@ class ImageController {
         artist: img.artist || 'Anónimo',
         category: img.category || 'otro',
         dimensions: img.dimensions || '',
-        url: `${baseUrl()}/${img.filename}`,
+        url: getImageUrl(img.filename),
         uploadDate: img.upload_date
       }));
 
@@ -59,33 +57,55 @@ class ImageController {
 
       const { title, description, artist, category, dimensions, uploadDate } = req.body;
 
+      // Generar nombre único para el archivo
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = req.file.originalname.split('.').pop();
+      const filename = `${uniqueSuffix}.${ext}`;
+
+      // Crear objeto de archivo temporal para S3
+      const fileToUpload = {
+        filename: filename,
+        path: null,
+        buffer: req.file.buffer,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      };
+
+      // Subir a S3
+      console.log(`📤 Iniciando upload a S3 para: ${filename}`);
+      const s3Url = await s3Service.uploadFile(fileToUpload);
+      console.log(`✅ Upload completado. URL: ${s3Url}`);
+
       const result = await pool.query(
         `INSERT INTO images (filename, title, description, artist, category, dimensions, filepath, file_size, mimetype, upload_date)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, COALESCE($10::timestamp, NOW()))
          RETURNING id, upload_date`,
         [
-          req.file.filename,
+          filename,
           title || 'Sin título',
           description || '',
           artist || 'Anónimo',
           category || 'otro',
           dimensions || '',
-          req.file.path,
+          s3Url,
           req.file.size,
           req.file.mimetype,
           parseUploadDate(uploadDate)
         ]
       );
 
+      const imageUrl = getImageUrl(filename);
+      console.log(`🖼️ URL generada para ${filename}: ${imageUrl}`);
+
       const imageData = {
         id: result.rows[0].id,
-        filename: req.file.filename,
+        filename: filename,
         title: title || 'Sin título',
         description: description || '',
         artist: artist || 'Anónimo',
         category: category || 'otro',
         dimensions: dimensions || '',
-        url: `${baseUrl()}/${req.file.filename}`,
+        url: imageUrl,
         fileSize: req.file.size,
         uploadDate: result.rows[0].upload_date
       };
@@ -134,7 +154,7 @@ class ImageController {
           artist: img.artist,
           category: img.category,
           dimensions: img.dimensions || '',
-          url: `${baseUrl()}/${img.filename}`,
+          url: getImageUrl(img.filename),
           uploadDate: img.upload_date
         }
       });
@@ -148,7 +168,6 @@ class ImageController {
   deleteImage = async (req, res) => {
     try {
       const { filename } = req.params;
-      const filepath = path.join(UPLOADS_DIR, filename);
 
       const found = await pool.query(
         'SELECT id FROM images WHERE filename = $1',
@@ -159,9 +178,8 @@ class ImageController {
         return res.status(404).json({ error: 'Imagen no encontrada' });
       }
 
-      if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath);
-      }
+      // Eliminar de S3
+      await s3Service.deleteFile(filename);
 
       await pool.query('DELETE FROM images WHERE filename = $1', [filename]);
 
@@ -172,17 +190,24 @@ class ImageController {
     }
   };
 
-  // Obtener una imagen por nombre de archivo
+  // Obtener una imagen por nombre de archivo (redirigir a S3)
   getImage = async (req, res) => {
     try {
       const { filename } = req.params;
-      const filepath = path.join(UPLOADS_DIR, filename);
 
-      if (!fs.existsSync(filepath)) {
+      // Verificar que existe en BD
+      const found = await pool.query(
+        'SELECT id FROM images WHERE filename = $1',
+        [filename]
+      );
+
+      if (found.rows.length === 0) {
         return res.status(404).json({ error: 'Imagen no encontrada' });
       }
 
-      res.sendFile(filepath);
+      // Redirigir a URL de S3
+      const s3Url = getImageUrl(filename);
+      res.redirect(s3Url);
     } catch (error) {
       console.error('Error al obtener imagen:', error);
       res.status(500).json({ error: 'Error al obtener imagen' });
