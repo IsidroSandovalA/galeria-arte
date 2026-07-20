@@ -18,6 +18,7 @@ function ArtistImageCard({ image, onDelete, onUpdate }) {
     artist: image.artist || '',
     category: image.category || 'otro',
     description: image.description || '',
+    dimensions: image.dimensions || '',
     uploadDate: image.uploadDate ? String(image.uploadDate).slice(0, 10) : ''
   })
   const qrRef = useRef()
@@ -157,6 +158,14 @@ function ArtistImageCard({ image, onDelete, onUpdate }) {
             onChange={(e) => setForm({ ...form, uploadDate: e.target.value })}
           />
 
+          <label>Dimensiones</label>
+          <input
+            type="text"
+            placeholder="ej: 30x40cm"
+            value={form.dimensions}
+            onChange={(e) => setForm({ ...form, dimensions: e.target.value })}
+          />
+
           <label>Descripción</label>
           <textarea
             rows="4"
@@ -184,6 +193,7 @@ function ArtistImageCard({ image, onDelete, onUpdate }) {
         <div className="artist-card-info">
           <h3>{image.title}</h3>
           {image.artist && <p className="artist">Por: {image.artist}</p>}
+          {image.dimensions && <p className="dimensions">📏 {image.dimensions}</p>}
         </div>
       )}
 

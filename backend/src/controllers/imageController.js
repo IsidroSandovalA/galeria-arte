@@ -26,7 +26,7 @@ class ImageController {
   getAllImages = async (req, res) => {
     try {
       const result = await pool.query(
-        `SELECT id, filename, title, description, artist, category, upload_date
+        `SELECT id, filename, title, description, artist, category, dimensions, upload_date
          FROM images
          ORDER BY upload_date DESC`
       );
@@ -38,6 +38,7 @@ class ImageController {
         description: img.description || '',
         artist: img.artist || 'Anónimo',
         category: img.category || 'otro',
+        dimensions: img.dimensions || '',
         url: `${baseUrl()}/${img.filename}`,
         uploadDate: img.upload_date
       }));
@@ -56,11 +57,11 @@ class ImageController {
         return res.status(400).json({ error: 'No se proporcionó archivo' });
       }
 
-      const { title, description, artist, category, uploadDate } = req.body;
+      const { title, description, artist, category, dimensions, uploadDate } = req.body;
 
       const result = await pool.query(
-        `INSERT INTO images (filename, title, description, artist, category, filepath, file_size, mimetype, upload_date)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, COALESCE($9::timestamp, NOW()))
+        `INSERT INTO images (filename, title, description, artist, category, dimensions, filepath, file_size, mimetype, upload_date)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, COALESCE($10::timestamp, NOW()))
          RETURNING id, upload_date`,
         [
           req.file.filename,
@@ -68,6 +69,7 @@ class ImageController {
           description || '',
           artist || 'Anónimo',
           category || 'otro',
+          dimensions || '',
           req.file.path,
           req.file.size,
           req.file.mimetype,
@@ -82,6 +84,7 @@ class ImageController {
         description: description || '',
         artist: artist || 'Anónimo',
         category: category || 'otro',
+        dimensions: dimensions || '',
         url: `${baseUrl()}/${req.file.filename}`,
         fileSize: req.file.size,
         uploadDate: result.rows[0].upload_date
@@ -101,7 +104,7 @@ class ImageController {
   updateImage = async (req, res) => {
     try {
       const { filename } = req.params;
-      const { title, description, artist, category, uploadDate } = req.body;
+      const { title, description, artist, category, dimensions, uploadDate } = req.body;
 
       const result = await pool.query(
         `UPDATE images
@@ -109,10 +112,11 @@ class ImageController {
              description = COALESCE($2, description),
              artist = COALESCE($3, artist),
              category = COALESCE($4, category),
-             upload_date = COALESCE($5::timestamp, upload_date)
-         WHERE filename = $6
-         RETURNING id, filename, title, description, artist, category, upload_date`,
-        [title, description, artist, category, parseUploadDate(uploadDate), filename]
+             dimensions = COALESCE($5, dimensions),
+             upload_date = COALESCE($6::timestamp, upload_date)
+         WHERE filename = $7
+         RETURNING id, filename, title, description, artist, category, dimensions, upload_date`,
+        [title, description, artist, category, dimensions, parseUploadDate(uploadDate), filename]
       );
 
       if (result.rows.length === 0) {
@@ -129,6 +133,7 @@ class ImageController {
           description: img.description || '',
           artist: img.artist,
           category: img.category,
+          dimensions: img.dimensions || '',
           url: `${baseUrl()}/${img.filename}`,
           uploadDate: img.upload_date
         }

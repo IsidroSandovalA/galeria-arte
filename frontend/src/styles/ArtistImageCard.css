@@ -146,6 +146,15 @@
   text-overflow: ellipsis;
 }
 
+.artist-card-info .dimensions {
+  color: #a89d94;
+  font-size: 0.85rem;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .qr-container {
   padding: 20px;
   background: rgba(200, 150, 62, 0.1);

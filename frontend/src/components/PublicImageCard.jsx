@@ -20,6 +20,9 @@ function PublicImageCard({ image, onSelect }) {
         {image.artist && (
           <p className="artist">Por: {image.artist}</p>
         )}
+        {image.dimensions && (
+          <p className="dimensions">📏 {image.dimensions}</p>
+        )}
       </div>
     </div>
   )

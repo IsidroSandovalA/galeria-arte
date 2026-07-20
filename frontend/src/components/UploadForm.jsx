@@ -11,6 +11,7 @@ function UploadForm({ onUpload }) {
   const [description, setDescription] = useState('')
   const [artist, setArtist] = useState('')
   const [category, setCategory] = useState('otro')
+  const [dimensions, setDimensions] = useState('')
   const [uploadDate, setUploadDate] = useState(() => new Date().toISOString().slice(0, 10))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,6 +45,7 @@ function UploadForm({ onUpload }) {
     formData.append('description', description)
     formData.append('artist', artist || 'Anónimo')
     formData.append('category', category)
+    formData.append('dimensions', dimensions)
     formData.append('uploadDate', uploadDate)
 
     try {
@@ -72,6 +74,7 @@ function UploadForm({ onUpload }) {
       setDescription('')
       setArtist('')
       setCategory('otro')
+      setDimensions('')
       setUploadDate(new Date().toISOString().slice(0, 10))
       setPreview(null)
       setError('')
@@ -152,6 +155,18 @@ function UploadForm({ onUpload }) {
             <option value="digital">Digital</option>
             <option value="otro">Otro</option>
           </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="dimensions">Dimensiones</label>
+          <input
+            type="text"
+            id="dimensions"
+            value={dimensions}
+            onChange={(e) => setDimensions(e.target.value)}
+            placeholder="ej: 30x40cm"
+            disabled={loading}
+          />
         </div>
 
         <div className="form-group">
